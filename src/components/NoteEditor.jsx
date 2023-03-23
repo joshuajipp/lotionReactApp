@@ -1,6 +1,7 @@
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 
 function NoteEditor(props) {
   const modules = {
@@ -24,6 +25,7 @@ function NoteEditor(props) {
 
   function submitNote() {
     const noteObj = {
+      uuid: uuidv4(),
       title: props.title,
       content: props.textContent,
       dateTime: props.dateTime,
