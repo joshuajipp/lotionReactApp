@@ -1,6 +1,6 @@
 import React from "react";
 
-function Navigation(props) {
+function LoginPage(props) {
   return (
     <nav className="navbar">
       <div className="menu button" onClick={props.toggleNotes}>
@@ -10,8 +10,7 @@ function Navigation(props) {
       </div>
       <h1 className={"logo-center header-title"}>Lotion</h1>
       <h2 className={"logo-center header-sub"}>Like Notion, but worse.</h2>
-      <button onClick={props.logOut}>Log out</button>
     </nav>
   );
 }
-export default Navigation;
+export default LoginPage;

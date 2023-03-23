@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import Navigation from "./Navigation";
 import BodyContent from "./BodyContent";
+import LoginPage from "./LoginPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   GoogleOAuthProvider,
@@ -57,15 +58,16 @@ function App() {
     <div className="body">
       {profile == null ? (
         <div>
-          <h2>React Google Login</h2>
-          <br />
-          <br />
-          <button onClick={() => login()}>Sign in with Google 🚀 </button>
+          <LoginPage/>
+          <div className="login-content">
+            <div>
+             <button className="login-button" onClick={() => login()}>Sign in with Google 🚀 </button>
+            </div>
+          </div>
         </div>
       ) : (
         <>
-          <Navigation toggleNotes={hideItem} />
-          <button onClick={logOut}>Log out</button>
+          <Navigation toggleNotes={hideItem} logOut={logOut}/>
           <BrowserRouter>
             <Routes>
               <Route
