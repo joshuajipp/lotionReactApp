@@ -82,13 +82,20 @@ function BodyContent(props) {
     setTextContent(event);
   }
 
-  function addNote(newNote) {
+  async function addNote(newNote) {
     setNotes([
       ...notes.slice(0, activeNote),
       newNote,
       ...notes.slice(activeNote + 1),
     ]);
-  }
+    const res = await fetch ("      ",
+      {
+        method:"POST",
+        headers:{"Content-Type": "functions/json"},
+        body: JSON.stringify({...newNote, email:props.profile.email})
+      }
+    )
+  };
 
   function newNote() {
     const newCurrDateTime = new Date(Date.now() - tzoffset)

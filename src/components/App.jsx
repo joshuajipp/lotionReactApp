@@ -53,7 +53,7 @@ function App() {
   function hideItem() {
     setVisability(!isNoteVisable);
   }
-
+  console.log(user)
   return (
     <div className="body">
       {profile == null ? (
@@ -67,24 +67,24 @@ function App() {
         </div>
       ) : (
         <>
-          <Navigation toggleNotes={hideItem} logOut={logOut}/>
+          <Navigation toggleNotes={hideItem} profile={profile} logOut={logOut}/>
           <BrowserRouter>
             <Routes>
               <Route
                 path="/"
-                element={<BodyContent isVisable={isNoteVisable} />}
+                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes"
-                element={<BodyContent isVisable={isNoteVisable} />}
+                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes/:activeNoteParam"
-                element={<BodyContent isVisable={isNoteVisable} />}
+                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes/:activeNoteParam/:editParam"
-                element={<BodyContent isVisable={isNoteVisable} />}
+                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
               />
             </Routes>
           </BrowserRouter>
