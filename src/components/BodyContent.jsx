@@ -91,7 +91,7 @@ function BodyContent(props) {
     const res = await fetch ("      ",
       {
         method:"POST",
-        headers:{"Content-Type": "functions/json"},
+        headers:{"token": props.user.access_token, "Content-Type": "functions/json"},
         body: JSON.stringify({...newNote, email:props.profile.email})
       }
     )
@@ -125,9 +125,16 @@ function BodyContent(props) {
     setDateTime(currNote.dateTime);
   }
 
-  function onDelete() {
+  async function onDelete() {
     const answer = window.confirm("Are you sure?");
     if (answer) {
+      const noteToDelete = notes[activeNote];
+      const res = await fetch (`(put link${noteToDelete.id}`,      
+      {
+        method:"DELETE",
+        headers: {"token": props.user.access_token,"Content-Type": "functions/json"}
+      });
+      if(res.ok){
       setNotes(notes.filter((_, index) => index !== activeNote));
       if (activeNote === 0) {
         setActiveNote(0);
@@ -147,8 +154,8 @@ function BodyContent(props) {
         }
       }
     }
+    }  
   }
-
   return (
     <div className="body-content">
       {props.isVisable && (
