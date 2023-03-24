@@ -8,43 +8,22 @@ function BodyContent(props) {
   console.log(localStorage.notes);
   const navigate = useNavigate();
 
-  const [notes, setNotes] = React.useState(
-    localStorage.notes ? JSON.parse(localStorage.notes) : []
-  );
+  const [notes, setNotes] = React.useState([]);
 
-  const [title, setTitle] = React.useState(
-    typeof localStorage.notes !== "undefined" && localStorage.notes !== "[]"
-      ? JSON.parse(localStorage.notes).at(parseInt(localStorage.activeNote))
-          .title
-      : "Untitled"
-  );
+  const [title, setTitle] = React.useState("Untitled");
 
-  const [textContent, setTextContent] = React.useState(
-    typeof localStorage.notes !== "undefined" && localStorage.notes !== "[]"
-      ? JSON.parse(localStorage.notes).at(parseInt(localStorage.activeNote))
-          .textContent
-      : ""
-  );
+  const [textContent, setTextContent] = React.useState("");
 
   const tzoffset = new Date().getTimezoneOffset() * 60000;
   const currDateTime = new Date(Date.now() - tzoffset)
     .toISOString()
     .slice(0, 19);
 
-  const [dateTime, setDateTime] = React.useState(
-    typeof localStorage.notes !== "undefined" && localStorage.notes !== "[]"
-      ? JSON.parse(localStorage.notes).at(parseInt(localStorage.activeNote))
-          .dateTime
-      : currDateTime
-  );
+  const [dateTime, setDateTime] = React.useState(currDateTime);
 
   const [isEditMode, setIsEditMode] = React.useState(true);
 
-  const [activeNote, setActiveNote] = React.useState(
-    parseInt(localStorage.activeNote) !== -1
-      ? parseInt(localStorage.activeNote)
-      : -1
-  );
+  const [activeNote, setActiveNote] = React.useState(-1);
 
   useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
