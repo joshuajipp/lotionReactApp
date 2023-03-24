@@ -110,28 +110,27 @@ function BodyContent(props) {
   async function onDelete() {
     const answer = window.confirm("Are you sure?");
     if (answer) {
+      const note = notes[activeNote];
+      const uuid = note.uuid;
       const res = await fetch (`https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,      
       {
         method:"DELETE",
-        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":activeNote}
+        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":uuid}
       });
       if (res.ok) {
-        console.log("Note deleted from backend.");
-        console.log("Before notes:", notes);
         const updatedNotes = notes.filter((_, index) => index !== activeNote);
-        console.log("Updated notes:", updatedNotes);
         setNotes(updatedNotes);
       
-      if (activeNote === 0) {
-        setActiveNote(0);
-        const currNote = notes.at(1);
-        if (notes.length !== 1) {
-          setTextContent(currNote.content);
-          setTitle(currNote.title);
-          setDateTime(currNote.dateTime);
+        if (activeNote === 0) {
+          setActiveNote(0);
+          const currNote = notes.at(1);
+          if (notes.length !== 1) {
+            setTextContent(currNote.content);
+            setTitle(currNote.title);
+            setDateTime(currNote.dateTime);
         }
-      } else {
-        if (notes.length !== 1) {
+        } else {
+          if (notes.length !== 1) {
           setActiveNote(0);
           const currNote = notes.at(0);
           setTextContent(currNote.content);
