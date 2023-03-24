@@ -7,17 +7,23 @@ def handler(event, context):
     dynamodb_resource = boto3.resource("dynamodb")
     table = dynamodb_resource.Table("lotion-30160521")
     header = event["headers"]
-    body = event["body"]
+    body = json.loads(event["body"])
 
-    req = requests.get(f'https://www.googleapis.com/oauth2/v1/userinfo?access_token={header["token"]}',
-                       headers={
-                           "Authorization": f"Bearer {header['token']}",
-                           "Accept": "application/json"
-                       })
-    if req.status_code == 401:
+    try:
+        req = requests.get(f'https://www.googleapis.com/oauth2/v1/userinfo?access_token={header["token"]}',
+                           headers={
+                               "Authorization": f"Bearer {header['token']}",
+                               "Accept": "application/json"
+                           })
+        if req.status_code == 401:
+            return {
+                "statusCode": 401,
+                "body": json.dumps({"message": "Invalid user"})
+            }
+    except Exception as e:
         return {
-            "statusCode": 401,
-            "body": json.dumps({"message": "Invalid user"})
+            "statusCode": 409,
+            "body": json.dumps({"error": str(e)})
         }
     try:
         table.put_item(Item=body)
