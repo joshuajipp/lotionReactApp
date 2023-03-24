@@ -4,36 +4,38 @@ import NoteEditor from "./NoteEditor";
 import { useNavigate, useParams } from "react-router-dom";
 
 function BodyContent(props) {
+
   const { activeNoteParam, editParam } = useParams();
-  console.log(localStorage.notes);
   const navigate = useNavigate();
-
   const [notes, setNotes] = React.useState([]);
-
   const [title, setTitle] = React.useState("Untitled");
-
-  const [textContent, setTextContent] = React.useState("");
-
+  const [textContent, setTextContent] = React.useState( "");
   const tzoffset = new Date().getTimezoneOffset() * 60000;
   const currDateTime = new Date(Date.now() - tzoffset)
     .toISOString()
     .slice(0, 19);
-
   const [dateTime, setDateTime] = React.useState(currDateTime);
-
   const [isEditMode, setIsEditMode] = React.useState(true);
-
   const [activeNote, setActiveNote] = React.useState(-1);
 
   useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-    if (notes.length === 0) {
-      setActiveNote(-1);
+    async function getNotes(){
+      const res = await fetch(`${props.profile.email}`);
+      const data = await res.json();
+      setNotes(data.notes);
     }
-  }, [notes]);
+    getNotes();
+  }, [props.profile.email]);
+  
 
   useEffect(() => {
-    localStorage.setItem("activeNote", activeNote.toString());
+    if (notes.length === 0) {
+      setActiveNote(-1);
+      navigate("/notes");
+    }
+  }, [notes, navigate]);
+
+  useEffect(() => {
     navigate(`/notes/${activeNote}${isEditMode ? "/edit" : ""}`);
   }, [activeNote, isEditMode, navigate]);
 
@@ -44,7 +46,7 @@ function BodyContent(props) {
     } else if (typeof editParam === "undefined") {
       setIsEditMode(false);
     }
-    const currNote = notes.at(parseInt(activeNoteParam));
+    const currNote = notes.find((note) => note.id === parseInt(activeNoteParam));
     if (notes.length !== 0) {
       setTextContent(currNote.content);
       setTitle(currNote.title);
@@ -67,14 +69,31 @@ function BodyContent(props) {
       newNote,
       ...notes.slice(activeNote + 1),
     ]);
-    const res = await fetch ("      ",
+    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws/",
       {
         method:"POST",
-        headers:{"token": props.user.access_token, "Content-Type": "functions/json"},
+        headers:{"token": props.user.access_token, "Content-Type": "application/json"},
         body: JSON.stringify({...newNote, email:props.profile.email})
       }
     )
-  };
+      console.log(res);
+  if (res.ok) {
+    const updatedNote = await res.json(); // Get the updated note from the server
+    // Find the index of the note with the same ID as the updated note
+    const updatedNoteIndex = notes.findIndex(
+      (note) => note.id === updatedNote.id
+    );
+    // Update the state of notes with the updated note
+    setNotes([
+      ...notes.slice(0, updatedNoteIndex),
+      updatedNote,
+      ...notes.slice(updatedNoteIndex + 1),
+    ]);
+  } else {
+    console.error(`Error adding note: ${res.status} ${res.statusText}`);
+  }
+}
+
 
   function newNote() {
     const newCurrDateTime = new Date(Date.now() - tzoffset)
