@@ -25,6 +25,16 @@ resource "aws_s3_bucket" "lambda" {
     bucket = "lambda-functions-bucket-30144999"
 }
 
+resource "null_resource" "install_dependencies" {
+  provisioner "local-exec" {
+    command = "pip install -r ../functions/save-note/requirements.txt -t ../functions/save-note/"
+  }
+    triggers = {
+      dependencies_versions = filemd5("../functions/save-note/requirements.txt")
+      source_versions = filemd5("../functions/save-note/main.py")
+  }
+}
+
 
 data "archive_file" "lambda_save_note" {
   type = "zip"
@@ -34,7 +44,7 @@ data "archive_file" "lambda_save_note" {
 }
 
 resource "aws_s3_object" "lambda_save_note" {
-  bucket = "lambda-functions-bucket-30144999"
+  bucket = aws_s3_bucket.lambda.id
 
   key    = "save-note-30144999.zip"
   source = data.archive_file.lambda_save_note.output_path
@@ -108,7 +118,7 @@ data "archive_file" "lambda_get_notes" {
 }
 
 resource "aws_s3_object" "lambda_get_notes" {
-  bucket = "lambda-functions-bucket-30144999"
+  bucket = aws_s3_bucket.lambda.id
 
   key    = "get-notes-30144999.zip"
   source = data.archive_file.lambda_get_notes.output_path
@@ -182,7 +192,7 @@ data "archive_file" "lambda_delete_note" {
 }
 
 resource "aws_s3_object" "lambda_delete_note" {
-  bucket = "lambda-functions-bucket-30144999"
+  bucket = aws_s3_bucket.lambda.id
 
   key    = "delete-note-30144999.zip"
   source = data.archive_file.lambda_delete_note.output_path
@@ -250,4 +260,68 @@ resource "aws_iam_role_policy_attachment" "lambda_logs_delete" {
 # output the name of the bucket after creation
 output "bucket_name" {
   value = aws_s3_bucket.lambda.bucket
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_dynamodb_table" "lotion-30160521" {
+  name         = "lotion-30160521"
+  billing_mode = "PROVISIONED"
+
+  # up to 8KB read per second (eventually consistent)
+  read_capacity = 1
+
+  # up to 1KB per second
+  write_capacity = 1
+
+  hash_key = "email"
+  range_key = "uuid"
+
+  # the hash_key data type is string
+  attribute {
+    name = "email"
+    type = "S"
+  }
+
+  attribute {
+    name = "uuid"
+    type = "S"
+  }
+}
+
+resource "aws_iam_policy" "dynamodb_policy" {
+  name        = "dynamodb-policy"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem"
+        ]
+        Resource = "arn:aws:dynamodb:ca-central-1:786714620860:table/lotion-30160521"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "dynamodb_policy_attachment" {
+  policy_arn = aws_iam_policy.dynamodb_policy.arn
+  role       = aws_iam_role.lambda_save.name
+}
+
+resource "aws_lambda_function_url" "url" {
+  function_name      = aws_lambda_function.lambda_save.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["GET", "POST", "PUT", "DELETE"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+output "lambda_url" {
+  value = aws_lambda_function_url.url.function_url
 }
