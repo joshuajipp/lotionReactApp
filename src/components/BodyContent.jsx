@@ -69,7 +69,7 @@ function BodyContent(props) {
       newNote,
       ...notes.slice(activeNote + 1),
     ]);
-    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws/",
+    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws",
       {
         method:"POST",
         headers:{"token": props.user.access_token, "Content-Type": "application/json"},

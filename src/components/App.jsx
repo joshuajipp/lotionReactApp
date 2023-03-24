@@ -67,24 +67,24 @@ function App() {
         </div>
       ) : (
         <>
-          <Navigation toggleNotes={hideItem} profile={profile} logOut={logOut}/>
+          <Navigation toggleNotes={hideItem}  profile={profile} logOut={logOut}/>
           <BrowserRouter>
             <Routes>
               <Route
                 path="/"
-                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
+                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes"
-                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
+                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes/:activeNoteParam"
-                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
+                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
               />
               <Route
                 path="/notes/:activeNoteParam/:editParam"
-                element={<BodyContent profile={profile} isVisable={isNoteVisable} />}
+                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
               />
             </Routes>
           </BrowserRouter>
