@@ -69,29 +69,13 @@ function BodyContent(props) {
       newNote,
       ...notes.slice(activeNote + 1),
     ]);
-    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws",
+    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws/",
       {
         method:"POST",
         headers:{"token": props.user.access_token, "Content-Type": "application/json"},
         body: JSON.stringify({...newNote, email:props.profile.email})
       }
     )
-      console.log(res);
-  if (res.ok) {
-    const updatedNote = await res.json(); // Get the updated note from the server
-    // Find the index of the note with the same ID as the updated note
-    const updatedNoteIndex = notes.findIndex(
-      (note) => note.id === updatedNote.id
-    );
-    // Update the state of notes with the updated note
-    setNotes([
-      ...notes.slice(0, updatedNoteIndex),
-      updatedNote,
-      ...notes.slice(updatedNoteIndex + 1),
-    ]);
-  } else {
-    console.error(`Error adding note: ${res.status} ${res.statusText}`);
-  }
 }
 
 
@@ -126,14 +110,18 @@ function BodyContent(props) {
   async function onDelete() {
     const answer = window.confirm("Are you sure?");
     if (answer) {
-      const noteToDelete = notes[activeNote];
-      const res = await fetch (`(put link${noteToDelete.id}`,      
+      const res = await fetch (`https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,      
       {
         method:"DELETE",
-        headers: {"token": props.user.access_token,"Content-Type": "functions/json"}
+        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":activeNote}
       });
-      if(res.ok){
-      setNotes(notes.filter((_, index) => index !== activeNote));
+      if (res.ok) {
+        console.log("Note deleted from backend.");
+        console.log("Before notes:", notes);
+        const updatedNotes = notes.filter((_, index) => index !== activeNote);
+        console.log("Updated notes:", updatedNotes);
+        setNotes(updatedNotes);
+      
       if (activeNote === 0) {
         setActiveNote(0);
         const currNote = notes.at(1);
