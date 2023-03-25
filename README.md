@@ -3,11 +3,11 @@
 ## 
 
 ## Technologies Used
-###Frontend###
+###Frontend
 React.js
 no css framework (even though you can clearly tell...)
 
-###Backend### 
+###Backend
 * **AWS**: services being used are lambda, s3 and dynamodb
 * **Python**: for CRUD operations
 * **Terraform**: to build and manage infrastructure
