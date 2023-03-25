@@ -1,6 +1,6 @@
 # Lotion Plus
 
-## 
+## **URL:** https://exquisite-hamster-0169f7.netlify.app/
 
 ## Technologies Used
 ### Frontend
