@@ -17,10 +17,9 @@ function App() {
   const [isNoteVisable, setVisability] = React.useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   let sessionTimeoutId;
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
 
-  
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
@@ -54,7 +53,7 @@ function App() {
         })
         .catch((err) => console.log(err));
     }
-    return ()=> clearTimeout(sessionTimeoutId);
+    return () => clearTimeout(sessionTimeoutId);
   }, [user]);
 
   // log out function to log the user out of google and set the profile array to null
@@ -80,38 +79,68 @@ function App() {
   function hideItem() {
     setVisability(!isNoteVisable);
   }
-  console.log(user)
+  console.log(user);
   return (
     <div className="body">
       {profile == null ? (
         <div>
-          <LoginPage/>
+          <LoginPage />
           <div className="login-content">
             <div>
-             <button className="login-button" onClick={() => login()}>Sign in with Google 🚀 </button>
+              <button className="login-button" onClick={() => login()}>
+                Sign in with Google 🚀{" "}
+              </button>
             </div>
           </div>
         </div>
       ) : (
         <>
-          <Navigation toggleNotes={hideItem}  profile={profile} logOut={logOut}/>
+          <Navigation
+            toggleNotes={hideItem}
+            profile={profile}
+            logOut={logOut}
+          />
           <BrowserRouter>
             <Routes>
               <Route
                 path="/"
-                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
+                element={
+                  <BodyContent
+                    user={user}
+                    profile={profile}
+                    isVisable={isNoteVisable}
+                  />
+                }
               />
               <Route
                 path="/notes"
-                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
+                element={
+                  <BodyContent
+                    user={user}
+                    profile={profile}
+                    isVisable={isNoteVisable}
+                  />
+                }
               />
               <Route
                 path="/notes/:activeNoteParam"
-                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
+                element={
+                  <BodyContent
+                    user={user}
+                    profile={profile}
+                    isVisable={isNoteVisable}
+                  />
+                }
               />
               <Route
                 path="/notes/:activeNoteParam/:editParam"
-                element={<BodyContent user={user} profile={profile} isVisable={isNoteVisable} />}
+                element={
+                  <BodyContent
+                    user={user}
+                    profile={profile}
+                    isVisable={isNoteVisable}
+                  />
+                }
               />
             </Routes>
           </BrowserRouter>

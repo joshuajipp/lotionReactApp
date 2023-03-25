@@ -23,16 +23,38 @@ function NoteEditor(props) {
     props.setDateTime(event.target.value);
   }
 
-  function submitNote() {
-    const noteObj = {
-      uuid: uuidv4(),
-      title: props.title,
-      content: props.textContent,
-      dateTime: props.dateTime,
-    };
+  async function submitNote(event) {
+    if (
+      Number.isInteger(props.activeNote) &&
+      props.activeNote > -1 &&
+      event.target.textContent === "Save"
+    ) {
+      if (props.notes.at(props.activeNote).uuid) {
+        const note = props.notes[props.activeNote];
 
+        await fetch(
+          `https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,
+          {
+            method: "DELETE",
+            headers: {
+              token: props.user.access_token,
+              "Content-Type": "application/json",
+              email: props.profile.email,
+              uuid: note.uuid,
+            },
+          }
+        );
+      }
+      const noteObj = {
+        uuid: uuidv4(),
+        title: props.title,
+        content: props.textContent,
+        dateTime: props.dateTime,
+      };
+
+      props.onAdd(noteObj);
+    }
     props.onEditToggle();
-    props.onAdd(noteObj);
   }
 
   return (

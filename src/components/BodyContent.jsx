@@ -4,7 +4,6 @@ import NoteEditor from "./NoteEditor";
 import { useNavigate, useParams } from "react-router-dom";
 
 function BodyContent(props) {
-
   const { activeNoteParam, editParam } = useParams();
   const navigate = useNavigate();
   const [notes, setNotes] = React.useState([]);
@@ -18,29 +17,31 @@ function BodyContent(props) {
   const [isEditMode, setIsEditMode] = React.useState(true);
   const [activeNote, setActiveNote] = React.useState(-1);
 
-   useEffect(() => {
-     async function fetchNotes(){
-       if (props.profile !== null){
-         await fetch('https://zda7rn7h2vryc2j4qp6mkgshlu0pfryj.lambda-url.ca-central-1.on.aws/', {
-           method: "GET",
-           headers: {
-             "Content-Type": "application/json",
-             "token": props.user.access_token,
-             "email": props.profile.email
-           }
-         })
-         .then(response => response.json())
-         .then(data => setNotes(data.items))
-         setActiveNote(notes.length);
-       }
-     }
+  useEffect(() => {
+    async function fetchNotes() {
+      if (props.profile !== null) {
+        await fetch(
+          "https://zda7rn7h2vryc2j4qp6mkgshlu0pfryj.lambda-url.ca-central-1.on.aws/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              token: props.user.access_token,
+              email: props.profile.email,
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => setNotes(data.items));
+        setActiveNote(notes.length);
+      }
+    }
 
-     fetchNotes();
-    }, [props.profile])
+    fetchNotes();
+  }, [props.profile]);
 
   useEffect(() => {
     if (notes.length === 0) {
-      
       setActiveNote(-1);
       navigate("/notes");
     }
@@ -57,7 +58,9 @@ function BodyContent(props) {
     } else if (typeof editParam === "undefined") {
       setIsEditMode(false);
     }
-    const currNote = notes.find((note) => note.id === parseInt(activeNoteParam));
+    const currNote = notes.find(
+      (note) => note.id === parseInt(activeNoteParam)
+    );
     if (notes.length !== 0) {
       setTextContent(currNote.content);
       setTitle(currNote.title);
@@ -80,15 +83,18 @@ function BodyContent(props) {
       newNote,
       ...notes.slice(activeNote + 1),
     ]);
-    const res = await fetch ("https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws/",
+    const res = await fetch(
+      "https://gnrtbjtaymhguvwn34u6cdgela0txedp.lambda-url.ca-central-1.on.aws/",
       {
-        method:"POST",
-        headers:{"token": props.user.access_token, "Content-Type": "application/json"},
-        body: JSON.stringify({...newNote, email:props.profile.email})
+        method: "POST",
+        headers: {
+          token: props.user.access_token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...newNote, email: props.profile.email }),
       }
-    )
-}
-
+    );
+  }
 
   function newNote() {
     const newCurrDateTime = new Date(Date.now() - tzoffset)
@@ -121,19 +127,19 @@ function BodyContent(props) {
   async function onDelete() {
     const answer = window.confirm("Are you sure?");
     if (answer) {
-       const updatedNotes = notes.filter((_, index) => index !== activeNote);
-        setNotes(updatedNotes);
-      
-        if (activeNote === 0) {
-          setActiveNote(0);
-          const currNote = notes.at(1);
-          if (notes.length !== 1) {
-            setTextContent(currNote.content);
-            setTitle(currNote.title);
-            setDateTime(currNote.dateTime);
+      const updatedNotes = notes.filter((_, index) => index !== activeNote);
+      setNotes(updatedNotes);
+
+      if (activeNote === 0) {
+        setActiveNote(0);
+        const currNote = notes.at(1);
+        if (notes.length !== 1) {
+          setTextContent(currNote.content);
+          setTitle(currNote.title);
+          setDateTime(currNote.dateTime);
         }
-        } else {
-          if (notes.length !== 1) {
+      } else {
+        if (notes.length !== 1) {
           setActiveNote(0);
           const currNote = notes.at(0);
           setTextContent(currNote.content);
@@ -143,13 +149,19 @@ function BodyContent(props) {
       }
       const note = notes[activeNote];
       const uuid = note.uuid;
-      const res = await fetch (`https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,      
-      {
-        method:"DELETE",
-        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":uuid}
-      });
-      
-    }  
+      const res = await fetch(
+        `https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,
+        {
+          method: "DELETE",
+          headers: {
+            token: props.user.access_token,
+            "Content-Type": "application/json",
+            email: props.profile.email,
+            uuid: uuid,
+          },
+        }
+      );
+    }
   }
   return (
     <div className="body-content">
@@ -174,6 +186,9 @@ function BodyContent(props) {
           onEditToggle={onEditToggle}
           activeNote={activeNote}
           onDelete={onDelete}
+          notes={notes}
+          user={props.user}
+          profile={props.profile}
         />
       ) : (
         <div className="instr-text">
