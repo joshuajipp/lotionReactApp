@@ -4,8 +4,8 @@
 
 ## Technologies Used
 ### Frontend
-React.js
-no css framework (even though you can clearly tell...)
+* React.js
+* no css framework (even though you can clearly tell...)
 
 ### Backend
 * **AWS**: services being used are lambda, s3 and dynamodb
