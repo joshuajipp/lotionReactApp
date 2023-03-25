@@ -9,7 +9,7 @@ function BodyContent(props) {
   const navigate = useNavigate();
   const [notes, setNotes] = React.useState([]);
   const [title, setTitle] = React.useState("Untitled");
-  const [textContent, setTextContent] = React.useState( "");
+  const [textContent, setTextContent] = React.useState("");
   const tzoffset = new Date().getTimezoneOffset() * 60000;
   const currDateTime = new Date(Date.now() - tzoffset)
     .toISOString()
@@ -18,18 +18,29 @@ function BodyContent(props) {
   const [isEditMode, setIsEditMode] = React.useState(true);
   const [activeNote, setActiveNote] = React.useState(-1);
 
-  useEffect(() => {
-    async function getNotes(){
-      const res = await fetch(`${props.profile.email}`);
-      const data = await res.json();
-      setNotes(data.notes);
-    }
-    getNotes();
-  }, [props.profile.email]);
-  
+   useEffect(() => {
+     async function fetchNotes(){
+       if (props.profile !== null){
+         await fetch('https://zda7rn7h2vryc2j4qp6mkgshlu0pfryj.lambda-url.ca-central-1.on.aws/', {
+           method: "GET",
+           headers: {
+             "Content-Type": "application/json",
+             "token": props.user.access_token,
+             "email": props.profile.email
+           }
+         })
+         .then(response => response.json())
+         .then(data => setNotes(data.items))
+         setActiveNote(notes.length);
+       }
+     }
+
+     fetchNotes();
+    }, [props.profile])
 
   useEffect(() => {
     if (notes.length === 0) {
+      
       setActiveNote(-1);
       navigate("/notes");
     }
@@ -110,15 +121,7 @@ function BodyContent(props) {
   async function onDelete() {
     const answer = window.confirm("Are you sure?");
     if (answer) {
-      const note = notes[activeNote];
-      const uuid = note.uuid;
-      const res = await fetch (`https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,      
-      {
-        method:"DELETE",
-        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":uuid}
-      });
-      if (res.ok) {
-        const updatedNotes = notes.filter((_, index) => index !== activeNote);
+       const updatedNotes = notes.filter((_, index) => index !== activeNote);
         setNotes(updatedNotes);
       
         if (activeNote === 0) {
@@ -138,7 +141,14 @@ function BodyContent(props) {
           setDateTime(currNote.dateTime);
         }
       }
-    }
+      const note = notes[activeNote];
+      const uuid = note.uuid;
+      const res = await fetch (`https://yhngpb6v55hwvycmtrvg4bfom40wsrpm.lambda-url.ca-central-1.on.aws/`,      
+      {
+        method:"DELETE",
+        headers: {"token": props.user.access_token,"Content-Type": "application/json","email":props.profile.email,"uuid":uuid}
+      });
+      
     }  
   }
   return (

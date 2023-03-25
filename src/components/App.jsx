@@ -12,17 +12,22 @@ import {
 } from "@react-oauth/google";
 import axios from "axios";
 
+const sessionTimeoutDuration = 300000;
 function App() {
   const [isNoteVisable, setVisability] = React.useState(true);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  let sessionTimeoutId;
   const [user, setUser] = useState([]);
   const [profile, setProfile] = useState(null);
 
-  console.log(profile);
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => setUser(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
+  
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -39,16 +44,38 @@ function App() {
         .then((res) => {
           setProfile(res.data);
           console.log(res.data);
+          sessionTimeoutId = setTimeout(() => {
+            setUser(null);
+            setIsLoggedIn(false);
+            setProfile(null);
+            localStorage.removeItem("user");
+            console.log("Session timed out");
+          }, sessionTimeoutDuration);
         })
         .catch((err) => console.log(err));
     }
+    return ()=> clearTimeout(sessionTimeoutId);
   }, [user]);
 
   // log out function to log the user out of google and set the profile array to null
   const logOut = () => {
     googleLogout();
     setProfile(null);
+    setIsLoggedIn(false);
+    clearTimeout(sessionTimeoutId);
+    localStorage.removeItem("user");
   };
+
+  const onSuccess = (codeResponse) => {
+    setUser(codeResponse);
+    setIsLoggedIn(true);
+    localStorage.setItem("user", JSON.stringify(codeResponse));
+  };
+
+  const login = useGoogleLogin({
+    onSuccess,
+    onError: (error) => console.log("Login Failed:", error),
+  });
 
   function hideItem() {
     setVisability(!isNoteVisable);
